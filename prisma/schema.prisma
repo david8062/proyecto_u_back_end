@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  uniqueID         String     @id @default(uuid())
+  primer_nombre    String     @db.VarChar(70)
+  segundo_nombre   String?    @db.VarChar(70)
+  primer_apellido  String     @db.VarChar(70)
+  segundo_apellido String     @db.VarChar(70)
+  cod_estudiante   String?    @db.VarChar(20)
+  email            String     @unique @db.VarChar(70)
+  has_password     String     @db.VarChar(256)
+
+  faculty_uuid     String
+  user_rol_id      String   @unique
+  id_password_reset String?   // esto es un FK (opcional)
+
+  // Relaciones
+  faculty          Faculty    @relation(fields: [faculty_uuid], references: [uniqueID])
+  role             UserRol    @relation("UserToUserRol", fields: [user_rol_id], references: [uniqueID])
+  passwordReset    PasswordReset?
+  loginAttempts    LoginAttemp[]
+}
+
+model Faculty {
+  uniqueID     String   @id @default(uuid())
+  faculty_name String   @db.VarChar(30)
+
+  users        User[]
+}
+
+model Rol {
+  uniqueID  String        @id @default(uuid())
+  name_rol  String        @db.VarChar(10)
+
+  userRoles UserRol[]
+  permissions RolePermission[]
+}
+
+model UserRol {
+  uniqueID  String   @id @default(uuid())
+  rol_uuid  String
+  user_uuid String   @unique
+
+  rol  Rol   @relation(fields: [rol_uuid], references: [uniqueID])
+  user User?  @relation("UserToUserRol")
+}
+
+model RolePermission {
+  uuid             String   @id @default(uuid())
+  view_permission  String   @db.VarChar(10)
+  action_permission String  @db.VarChar(10)
+
+  rol_id           String
+  rol              Rol     @relation(fields: [rol_id], references: [uniqueID])
+}
+
+model PasswordReset {
+  uniqueID     String   @id @default(uuid())
+  fecha        DateTime
+  old_password String
+  new_password String
+  ip           String
+  user_id      String   @unique
+
+  user         User     @relation(fields: [user_id], references: [uniqueID])
+}
+
+model VerifyToken {
+  uniqueID String  @id @default(uuid())
+  token    String  @db.VarChar(50)
+  otp      String  @db.VarChar(6)
+
+  loginAttempts LoginAttemp[]
+}
+
+model LoginAttemp {
+  unique_ID     String   @id @default(uuid())
+  ip            Int
+  quantity      Int
+  login_acces   DateTime
+  user_id       String
+  id_token      String
+
+  user          User       @relation(fields: [user_id], references: [uniqueID])
+  verifyToken   VerifyToken @relation(fields: [id_token], references: [uniqueID])
+}
