@@ -1,12 +1,12 @@
 export class CreateUserDto {
-  firstName: string | undefined;
+  firstName!: string;
   middleName?: string;
-  lastName: string | undefined;
-  secondLastName: string | undefined;
+  lastName!: string;
+  secondLastName!: string;
   studentCode?: string;
-  email: string | undefined;
-  password: string | undefined;
-  facultyId: string | undefined;
-  userRoleId: string | undefined;
+  email!: string;
+  password!: string;
+  facultyId!: string;
   passwordResetId?: string;
+  roles!: string;
 }

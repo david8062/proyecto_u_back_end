@@ -14,24 +14,24 @@ datasource db {
 }
 
 model User {
-  uniqueID         String     @id @default(uuid())
-  primer_nombre    String     @db.VarChar(70)
-  segundo_nombre   String?    @db.VarChar(70)
-  primer_apellido  String     @db.VarChar(70)
-  segundo_apellido String     @db.VarChar(70)
-  cod_estudiante   String?    @db.VarChar(20)
-  email            String     @unique @db.VarChar(70)
-  has_password     String     @db.VarChar(256)
+  uniqueID         String   @id @default(uuid())
+  primer_nombre    String   @db.VarChar(70)
+  segundo_nombre   String?  @db.VarChar(70)
+  primer_apellido  String   @db.VarChar(70)
+  segundo_apellido String   @db.VarChar(70)
+  cod_estudiante   String?  @db.VarChar(20)
+  email            String   @unique @db.VarChar(70)
+  has_password     String   @db.VarChar(256)
 
   faculty_uuid     String
-  user_rol_id      String   @unique
-  id_password_reset String?   // esto es un FK (opcional)
+  rol_uuid         String   // <--- Relación directa al rol
+  id_password_reset String?
 
   // Relaciones
-  faculty          Faculty    @relation(fields: [faculty_uuid], references: [uniqueID])
-  role             UserRol    @relation("UserToUserRol", fields: [user_rol_id], references: [uniqueID])
-  passwordReset    PasswordReset?
-  loginAttempts    LoginAttemp[]
+  faculty       Faculty    @relation(fields: [faculty_uuid], references: [uniqueID])
+  role          Rol        @relation(fields: [rol_uuid], references: [uniqueID])
+  passwordReset PasswordReset?
+  loginAttempts LoginAttemp[]
 }
 
 model Faculty {
@@ -41,22 +41,15 @@ model Faculty {
   users        User[]
 }
 
-model Rol {
-  uniqueID  String        @id @default(uuid())
-  name_rol  String        @db.VarChar(10)
 
-  userRoles UserRol[]
+model Rol {
+  uniqueID    String   @id @default(uuid())
+  name_rol    String   @db.VarChar(10)
+  users       User[]   // Relación inversa
   permissions RolePermission[]
 }
 
-model UserRol {
-  uniqueID  String   @id @default(uuid())
-  rol_uuid  String
-  user_uuid String   @unique
 
-  rol  Rol   @relation(fields: [rol_uuid], references: [uniqueID])
-  user User?  @relation("UserToUserRol")
-}
 
 model RolePermission {
   uuid             String   @id @default(uuid())

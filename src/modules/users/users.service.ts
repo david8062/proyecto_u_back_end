@@ -3,10 +3,14 @@ import { User } from '@prisma/client';
 import { UserRepository } from './repository/user.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PrismaService } from '@/prisma/prisma.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly prisma: PrismaService,
+  ) {}
 
   async findAll(): Promise<User[]> {
     return this.userRepository.findAll();
@@ -21,7 +25,7 @@ export class UsersService {
   }
 
   async create(dto: CreateUserDto): Promise<User> {
-    const data = {
+    const user = await this.userRepository.create({
       primer_nombre: dto.firstName,
       segundo_nombre: dto.middleName,
       primer_apellido: dto.lastName,
@@ -29,12 +33,18 @@ export class UsersService {
       cod_estudiante: dto.studentCode,
       email: dto.email,
       has_password: dto.password,
-      faculty_uuid: dto.facultyId,
-      user_rol_id: dto.userRoleId,
-      id_password_reset: dto.passwordResetId,
-    };
+      faculty: {
+        connect: { uniqueID: dto.facultyId },
+      },
+      role: {
+        connect: { uniqueID: dto.roles }, // ✅ Relación directa
+      },
+      passwordReset: dto.passwordResetId
+        ? { connect: { uniqueID: dto.passwordResetId } }
+        : undefined,
+    });
 
-    return this.userRepository.create(data);
+    return user;
   }
 
   async update(id: string, dto: UpdateUserDto): Promise<User> {
@@ -49,15 +59,18 @@ export class UsersService {
       email: dto.email,
       has_password: dto.password,
       faculty_uuid: dto.facultyId,
-      user_rol_id: dto.userRoleId,
       id_password_reset: dto.passwordResetId,
     };
 
-    return this.userRepository.update(id, data);
+    const updatedUser = await this.userRepository.update(id, data);
+
+    // Opcional: actualizar roles
+
+    return updatedUser;
   }
 
   async delete(id: string): Promise<void> {
-    await this.findById(id);
-    return this.userRepository.delete(id);
+    await this.findById(id); // Asegura que el usuario exista
+    await this.userRepository.delete(id);
   }
 }
