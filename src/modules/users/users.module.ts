@@ -5,8 +5,8 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { UserRepository } from './repository/user.repository';
 
 @Module({
-  controllers: [UsersController], // ✅ solo controladores
-  providers: [UsersService, UserRepository, PrismaService], // ✅ aquí van los servicios y repositorios
-  exports: [UserRepository], // si necesitas usarlo fuera
+  controllers: [UsersController],
+  providers: [UsersService, UserRepository, PrismaService],
+  exports: [UserRepository],
 })
 export class UsersModule {}

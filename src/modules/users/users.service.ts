@@ -4,6 +4,7 @@ import { UserRepository } from './repository/user.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '@/prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -25,6 +26,7 @@ export class UsersService {
   }
 
   async create(dto: CreateUserDto): Promise<User> {
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
     const user = await this.userRepository.create({
       primer_nombre: dto.firstName,
       segundo_nombre: dto.middleName,
@@ -32,7 +34,7 @@ export class UsersService {
       segundo_apellido: dto.secondLastName,
       cod_estudiante: dto.studentCode,
       email: dto.email,
-      has_password: dto.password,
+      has_password: hashedPassword,
       faculty: {
         connect: { uniqueID: dto.facultyId },
       },

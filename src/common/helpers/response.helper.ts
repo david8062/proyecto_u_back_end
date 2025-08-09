@@ -1,13 +1,13 @@
 // src/common/helpers/response.helper.ts
 
-interface SuccessResponse<T> {
+export interface SuccessResponse<T> {
   success: true;
   message: string;
   data: T;
   timestamp: string;
 }
 
-interface ErrorResponse {
+export interface ErrorResponse {
   success: false;
   message: string;
   data: null | Record<string, unknown>;
