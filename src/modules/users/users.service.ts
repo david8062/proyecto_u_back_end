@@ -39,7 +39,7 @@ export class UsersService {
         connect: { uniqueID: dto.facultyId },
       },
       role: {
-        connect: { uniqueID: dto.roles }, // ✅ Relación directa
+        connect: { uniqueID: dto.roles },
       },
       passwordReset: dto.passwordResetId
         ? { connect: { uniqueID: dto.passwordResetId } }

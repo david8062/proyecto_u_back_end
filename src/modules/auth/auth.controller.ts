@@ -1,11 +1,32 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ResponseHelper } from '@/common/helpers/response.helper';
 import { LoginDto } from './dto/login.dto';
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { UsersService } from '@/modules/users/users.service';
+import { Request as ExpressRequest } from 'express';
+
+interface AuthenticatedRequest extends ExpressRequest {
+  user: {
+    uniqueID: string;
+    email: string;
+    role: string;
+  };
+}
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UsersService,
+  ) {}
 
   @Post('login')
   async login(@Body() { email, password }: LoginDto) {
@@ -15,5 +36,12 @@ export class AuthController {
 
     const result = await this.authService.login(email, password);
     return ResponseHelper.success(result, 'Login successful');
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getProfile(@Request() req: AuthenticatedRequest) {
+    const user = await this.userService.findById(req.user.uniqueID);
+    return ResponseHelper.success(user, 'Profile retrieved successfully');
   }
 }

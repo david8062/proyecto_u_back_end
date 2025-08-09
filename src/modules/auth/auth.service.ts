@@ -20,12 +20,10 @@ export class AuthService {
       (await this.authRepository.findByCode(identifier));
 
     if (!user) {
-      throw new NotFoundException('Usuario no encontrado');
+      throw new NotFoundException('User not found');
     }
     if (!user.has_password) {
-      throw new UnauthorizedException(
-        'El usuario no tiene contraseña configurada',
-      );
+      throw new UnauthorizedException('User does not have a password set up');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.has_password);
