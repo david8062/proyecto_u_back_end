@@ -31,7 +31,7 @@ export class UsersService {
       primer_nombre: dto.firstName,
       segundo_nombre: dto.middleName,
       primer_apellido: dto.lastName,
-      segundo_apellido: dto.secondLastName,
+      segundo_apellido: dto.secondLastName ?? '',
       cod_estudiante: dto.studentCode,
       email: dto.email,
       has_password: hashedPassword,

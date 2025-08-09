@@ -40,6 +40,33 @@ export class AuthService {
 
     return {
       token,
+      refreshToken: null,
     };
+  }
+
+  async refreshToken(refreshToken: string) {
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: process.env.JWT_SECRET,
+      });
+
+      // Aquí podrías validar si el usuario sigue activo, etc.
+      const newPayload = {
+        sub: payload.sub,
+        email: payload.email,
+        role: payload.role,
+      };
+
+      const newAccessToken = await this.jwtService.signAsync(newPayload, {
+        expiresIn: process.env.JWT_EXPIRES_IN || '1h',
+      });
+
+      return { accessToken: newAccessToken };
+    } catch (e) {
+      throw new UnauthorizedException(
+        'Refresh token inválido o expirado' +
+          (e instanceof Error ? e.message : ''),
+      );
+    }
   }
 }

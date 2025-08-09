@@ -12,6 +12,7 @@ import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { UsersService } from '@/modules/users/users.service';
 import { Request as ExpressRequest } from 'express';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 interface AuthenticatedRequest extends ExpressRequest {
   user: {
@@ -43,5 +44,15 @@ export class AuthController {
   async getProfile(@Request() req: AuthenticatedRequest) {
     const user = await this.userService.findById(req.user.uniqueID);
     return ResponseHelper.success(user, 'Profile retrieved successfully');
+  }
+
+  @Post('refresh')
+  async refresh(@Body() { refreshToken }: RefreshTokenDto) {
+    const token = await this.authService.refreshToken(refreshToken ?? '');
+    return {
+      success: true,
+      message: 'Token refreshed successfully',
+      data: token,
+    };
   }
 }
