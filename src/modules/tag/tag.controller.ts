@@ -1,4 +1,3 @@
-// tag.controller.ts
 import {
   Controller,
   Get,
@@ -9,16 +8,19 @@ import {
   Delete,
   HttpException,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { TagService } from './tag.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { ResponseHelper } from '@/common/helpers/response.helper';
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 
 @Controller('tag')
 export class TagController {
   constructor(private readonly tagService: TagService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() createTagDto: CreateTagDto) {
     try {
@@ -70,6 +72,7 @@ export class TagController {
     }
   }
 
+  @UseGuards(JwtAuthGuard) // Solo usuarios logueados pueden actualizar
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateTagDto: UpdateTagDto) {
     try {
@@ -86,17 +89,17 @@ export class TagController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  async delete(@Param('id') id: string) {
     try {
-      await this.tagService.delete(+id);
-      return ResponseHelper.success(null, 'Tag deleted successfully');
+      await this.tagService.delete(id);
+      return ResponseHelper.success('Tag deleted successfully');
     } catch (error) {
-      throw new HttpException(
-        ResponseHelper.error('Failed to delete tag', {
-          error: (error as Error).message,
-        }),
-        HttpStatus.BAD_REQUEST,
-      );
+      if ((error as Error).message === 'TAG_NOT_FOUND') {
+        return ResponseHelper.error('Tag not found');
+      }
+      return ResponseHelper.error('Failed to delete tag', {
+        error: (error as Error).message,
+      });
     }
   }
 }

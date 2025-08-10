@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { Tag } from '@prisma/client';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma, Tag } from '@prisma/client';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { IBaseService } from '@/common/base/base.service.interface';
@@ -40,8 +40,18 @@ export class TagService implements IBaseService<Tag> {
   }
 
   async delete(id: string | number): Promise<void> {
-    await this.prisma.tag.delete({
-      where: { uniqueID: String(id) },
-    });
+    try {
+      await this.prisma.tag.delete({
+        where: { uniqueID: String(id) },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('Tag not found');
+      }
+      throw error;
+    }
   }
 }
