@@ -5,6 +5,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { CoursesModule } from './modules/courses/courses.module';
 import { ClassesModule } from './modules/classes/classes.module';
+import { MinioService } from './minio/minio.service';
+import { MinioModule } from './minio/minio.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { ClassesModule } from './modules/classes/classes.module';
     PrismaModule,
     CoursesModule,
     ClassesModule,
+    MinioModule,
   ],
+  providers: [MinioService],
 })
 export class AppModule {}

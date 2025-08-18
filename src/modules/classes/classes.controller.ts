@@ -9,12 +9,15 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { ClassesService } from './classes.service';
 import { ResponseHelper } from '@/common/helpers/response.helper';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { CreateClassesDto } from './dtos/create-classes.dto';
 import { UpdateClassesDto } from './dtos/update-classes.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('classes')
 export class ClassesController {
@@ -58,9 +61,20 @@ export class ClassesController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() createClassesDto: CreateClassesDto) {
+  @UseInterceptors(FileInterceptor('file'))
+  async create(
+    @Body() createClassesDto: CreateClassesDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
     try {
-      const classes = await this.classesService.create(createClassesDto);
+      if (!file) {
+        throw new HttpException(
+          ResponseHelper.error('Video file is required'),
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const classes = await this.classesService.create(createClassesDto, file);
       return ResponseHelper.success(classes, 'Class created successfully');
     } catch (error) {
       throw new HttpException(
