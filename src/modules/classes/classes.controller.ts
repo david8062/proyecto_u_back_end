@@ -7,56 +7,33 @@ import {
   Param,
   Delete,
   UseGuards,
-  HttpException,
-  HttpStatus,
   UseInterceptors,
   UploadedFile,
 } from '@nestjs/common';
 import { ClassesService } from './classes.service';
-import { ResponseHelper } from '@/common/helpers/response.helper';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { CreateClassesDto } from './dtos/create-classes.dto';
 import { UpdateClassesDto } from './dtos/update-classes.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
 
+@UseInterceptors(ResponseInterceptor) // 🔹 todas las respuestas pasan por el interceptor
 @Controller('classes')
 export class ClassesController {
   constructor(private readonly classesService: ClassesService) {}
 
   @Get()
   async findAll() {
-    try {
-      const classes = await this.classesService.getAll();
-      return ResponseHelper.success(classes, 'Classes retrieved successfully');
-    } catch (error) {
-      throw new HttpException(
-        ResponseHelper.error('Failed to retrieve classes', {
-          error: (error as Error).message,
-        }),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return this.classesService.getAll();
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    try {
-      const classes = await this.classesService.getById(id);
-      if (!classes) {
-        throw new HttpException(
-          ResponseHelper.error('Class not found'),
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      return ResponseHelper.success(classes, 'Class retrieved successfully');
-    } catch (error) {
-      throw new HttpException(
-        ResponseHelper.error('Failed to retrieve class', {
-          error: (error as Error).message,
-        }),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    const classes = await this.classesService.getById(id);
+    if (!classes) {
+      throw new Error('Class not found'); // el interceptor lo convierte en ErrorResponse
     }
+    return classes;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -66,24 +43,10 @@ export class ClassesController {
     @Body() createClassesDto: CreateClassesDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    try {
-      if (!file) {
-        throw new HttpException(
-          ResponseHelper.error('Video file is required'),
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      const classes = await this.classesService.create(createClassesDto, file);
-      return ResponseHelper.success(classes, 'Class created successfully');
-    } catch (error) {
-      throw new HttpException(
-        ResponseHelper.error('Failed to create class', {
-          error: (error as Error).message,
-        }),
-        HttpStatus.BAD_REQUEST,
-      );
+    if (!file) {
+      throw new Error('Video file is required');
     }
+    return this.classesService.create(createClassesDto, file);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -92,41 +55,17 @@ export class ClassesController {
     @Param('id') id: string,
     @Body() updateClassesDto: UpdateClassesDto,
   ) {
-    try {
-      const updatedClass = await this.classesService.update(
-        id,
-        updateClassesDto,
-      );
-      if (!updatedClass) {
-        throw new HttpException(
-          ResponseHelper.error('Class not found'),
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      return ResponseHelper.success(updatedClass, 'Class updated successfully');
-    } catch (error) {
-      throw new HttpException(
-        ResponseHelper.error('Failed to update class', {
-          error: (error as Error).message,
-        }),
-        HttpStatus.BAD_REQUEST,
-      );
+    const updatedClass = await this.classesService.update(id, updateClassesDto);
+    if (!updatedClass) {
+      throw new Error('Class not found');
     }
+    return updatedClass;
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async delete(@Param('id') id: string) {
-    try {
-      await this.classesService.delete(id);
-      return ResponseHelper.success(null, 'Class deleted successfully');
-    } catch (error) {
-      throw new HttpException(
-        ResponseHelper.error('Failed to delete class', {
-          error: (error as Error).message,
-        }),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    await this.classesService.delete(id);
+    return null;
   }
 }

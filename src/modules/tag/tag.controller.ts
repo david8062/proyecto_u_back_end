@@ -6,16 +6,16 @@ import {
   Patch,
   Param,
   Delete,
-  HttpException,
-  HttpStatus,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { TagService } from './tag.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
-import { ResponseHelper } from '@/common/helpers/response.helper';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
 
+@UseInterceptors(ResponseInterceptor) // 🔹 todas las respuestas pasan por el interceptor
 @Controller('tag')
 export class TagController {
   constructor(private readonly tagService: TagService) {}
@@ -23,83 +23,33 @@ export class TagController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() createTagDto: CreateTagDto) {
-    try {
-      const tag = await this.tagService.create(createTagDto);
-      return ResponseHelper.success(tag, 'Tag created successfully');
-    } catch (error) {
-      throw new HttpException(
-        ResponseHelper.error('Failed to create tag', {
-          error: (error as Error).message,
-        }),
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    return this.tagService.create(createTagDto);
   }
 
   @Get()
   async findAll() {
-    try {
-      const tags = await this.tagService.getAll();
-      return ResponseHelper.success(tags, 'Tags retrieved successfully');
-    } catch (error) {
-      throw new HttpException(
-        ResponseHelper.error('Failed to retrieve tags', {
-          error: (error as Error).message,
-        }),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return this.tagService.getAll();
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    try {
-      const tag = await this.tagService.getById(+id);
-      if (!tag) {
-        throw new HttpException(
-          ResponseHelper.error('Tag not found'),
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      return ResponseHelper.success(tag, 'Tag retrieved successfully');
-    } catch (error) {
-      throw new HttpException(
-        ResponseHelper.error('Failed to retrieve tag', {
-          error: (error as Error).message,
-        }),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    const tag = await this.tagService.getById(+id);
+    if (!tag) throw new Error('Tag not found');
+    return tag;
   }
 
-  @UseGuards(JwtAuthGuard) // Solo usuarios logueados pueden actualizar
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateTagDto: UpdateTagDto) {
-    try {
-      const updatedTag = await this.tagService.update(+id, updateTagDto);
-      return ResponseHelper.success(updatedTag, 'Tag updated successfully');
-    } catch (error) {
-      throw new HttpException(
-        ResponseHelper.error('Failed to update tag', {
-          error: (error as Error).message,
-        }),
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    const updatedTag = await this.tagService.update(+id, updateTagDto);
+    if (!updatedTag) throw new Error('Tag not found');
+    return updatedTag;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async delete(@Param('id') id: string) {
-    try {
-      await this.tagService.delete(id);
-      return ResponseHelper.success('Tag deleted successfully');
-    } catch (error) {
-      if ((error as Error).message === 'TAG_NOT_FOUND') {
-        return ResponseHelper.error('Tag not found');
-      }
-      return ResponseHelper.error('Failed to delete tag', {
-        error: (error as Error).message,
-      });
-    }
+    await this.tagService.delete(id);
+    return null; // el interceptor lo convierte en SuccessResponse
   }
 }

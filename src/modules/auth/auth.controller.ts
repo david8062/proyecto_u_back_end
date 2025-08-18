@@ -7,7 +7,6 @@ import {
   Request,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ResponseHelper } from '@/common/helpers/response.helper';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { UsersService } from '@/modules/users/users.service';
@@ -35,24 +34,17 @@ export class AuthController {
       throw new Error('Email and password must be strings');
     }
 
-    const result = await this.authService.login(email, password);
-    return ResponseHelper.success(result, 'Login successful');
+    return this.authService.login(email, password); // interceptor lo envuelve
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getProfile(@Request() req: AuthenticatedRequest) {
-    const user = await this.userService.findById(req.user.uniqueID);
-    return ResponseHelper.success(user, 'Profile retrieved successfully');
+    return this.userService.findById(req.user.uniqueID);
   }
 
   @Post('refresh')
   async refresh(@Body() { refreshToken }: RefreshTokenDto) {
-    const token = await this.authService.refreshToken(refreshToken ?? '');
-    return {
-      success: true,
-      message: 'Token refreshed successfully',
-      data: token,
-    };
+    return this.authService.refreshToken(refreshToken ?? '');
   }
 }
