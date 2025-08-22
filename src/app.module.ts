@@ -7,6 +7,7 @@ import { CoursesModule } from './modules/courses/courses.module';
 import { ClassesModule } from './modules/classes/classes.module';
 import { MinioService } from './minio/minio.service';
 import { MinioModule } from './minio/minio.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { MinioModule } from './minio/minio.module';
     CoursesModule,
     ClassesModule,
     MinioModule,
+    ReviewsModule,
   ],
   providers: [MinioService],
 })

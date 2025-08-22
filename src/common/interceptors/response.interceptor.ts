@@ -3,8 +3,9 @@ import {
   ExecutionContext,
   Injectable,
   NestInterceptor,
+  HttpException,
 } from '@nestjs/common';
-import { Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { ResponseHelper } from '../helpers/response.helper';
 
@@ -21,7 +22,6 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, unknown> {
           errorMessage = err.message;
         }
 
-        // Si err es objeto y tiene la propiedad 'response', la usamos solo si es un objeto
         if (err && typeof err === 'object' && 'response' in err) {
           const maybeResponse = (err as { response?: unknown }).response;
           if (maybeResponse && typeof maybeResponse === 'object') {
@@ -29,8 +29,10 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, unknown> {
           }
         }
 
-        const errorResponse = ResponseHelper.error(errorMessage, errorData);
-        return throwError(() => errorResponse);
+        throw new HttpException(
+          ResponseHelper.error(errorMessage, errorData),
+          400,
+        );
       }),
     );
   }

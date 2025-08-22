@@ -18,7 +18,19 @@ export class ResponseHelper {
   static success<T>(
     data: T,
     message = 'Operación exitosa',
-  ): SuccessResponse<T> {
+  ): SuccessResponse<T> | T {
+    // 🚨 Evita doble envoltura
+    if (
+      data &&
+      typeof data === 'object' &&
+      'success' in data &&
+      'message' in data &&
+      'data' in data &&
+      'timestamp' in data
+    ) {
+      return data as T;
+    }
+
     return {
       success: true,
       message,
