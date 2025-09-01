@@ -9,6 +9,8 @@ async function bootstrap() {
   // Prefijo global opcional: /api/...
   app.setGlobalPrefix('api');
 
+  app.enableCors();
+
   // Validaciones globales para DTOs
   app.useGlobalPipes(
     new ValidationPipe({
