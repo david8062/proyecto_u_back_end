@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalInterceptors(new ResponseInterceptor());
   // Prefijo global opcional: /api/...
-  // app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api');
 
   // Validaciones globales para DTOs
   app.useGlobalPipes(
