@@ -13,12 +13,15 @@ export class CoursesService implements IBaseService<Course> {
   constructor(private readonly prisma: PrismaService) {}
 
   async getAll(): Promise<Course[]> {
-    return this.prisma.course.findMany();
+    return this.prisma.course.findMany({
+      include: { teacher: true },
+    });
   }
 
   async getById(id: string | number): Promise<Course | null> {
     return this.prisma.course.findUnique({
       where: { uniqueID: String(id) },
+      include: { teacher: true },
     });
   }
 
