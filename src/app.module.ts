@@ -8,7 +8,6 @@ import { ClassesModule } from './modules/classes/classes.module';
 import { MinioService } from './minio/minio.service';
 import { MinioModule } from './minio/minio.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
-import { FacultyModule } from './modules/faculty/faculty.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { FacultiesModule } from './modules/faculties/faculties.module';
 
@@ -22,7 +21,7 @@ import { FacultiesModule } from './modules/faculties/faculties.module';
     ClassesModule,
     MinioModule,
     ReviewsModule,
-    FacultyModule,
+    FacultiesModule,
     CategoriesModule,
     FacultiesModule,
   ],

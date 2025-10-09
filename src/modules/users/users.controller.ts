@@ -22,8 +22,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Get()
   async findAll() {
-    const users = await this.usersService.findAll();
-    return ResponseHelper.success(users, 'Users retrieved successfully');
+    return this.usersService.findAll();
   }
 
   @UseGuards(JwtAuthGuard)
@@ -36,7 +35,6 @@ export class UsersController {
     return ResponseHelper.success(user, 'User retrieved successfully');
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() dto: CreateUserDto) {
     const user = await this.usersService.create(dto);
