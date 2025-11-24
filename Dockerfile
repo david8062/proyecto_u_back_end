@@ -1,18 +1,20 @@
 # Imagen base
 FROM node:24
 
-# Establece el directorio de trabajo
+# Crear directorio de trabajo
 WORKDIR /app
 
-# Copia dependencias y las instala
+# Copiar package.json y package-lock.json primero
 COPY package*.json ./
+
+# Instalar dependencias (incluye devDependencies)
 RUN npm install
 
-# Copia todo el proyecto
+# Copiar el resto del proyecto
 COPY . .
 
-# Expón el puerto de Nest
+# Exponer el puerto de NestJS
 EXPOSE 3000
 
-# Comando para desarrollo
+# Comando por defecto para desarrollo con hot reload
 CMD ["npm", "run", "start:dev"]

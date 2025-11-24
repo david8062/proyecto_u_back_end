@@ -10,6 +10,7 @@ import { MinioModule } from './minio/minio.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { FacultiesModule } from './modules/faculties/faculties.module';
+import { ProfilesModule } from './modules/profiles/profiles.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { FacultiesModule } from './modules/faculties/faculties.module';
     FacultiesModule,
     CategoriesModule,
     FacultiesModule,
+    ProfilesModule,
   ],
   providers: [MinioService],
 })

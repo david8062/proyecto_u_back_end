@@ -49,6 +49,8 @@ model User {
   ENROLLMENT ENROLLMENT[]
 
   Course Course[]
+
+  profiles  Profile[] // relación inversa
 }
 
 model Faculty {
@@ -192,3 +194,17 @@ model Review {
   user User @relation(fields: [user_id], references: [uniqueID])
   course Course @relation(fields: [coursed_id], references: [uniqueID])
  }
+
+model Profile {
+  UniqueID                   String  @id @default(uuid())
+  description                String?
+  experience                 String?
+  profile_img                String?
+  specialization             String?
+  web_site                   String?
+  social_networks            String?
+  professional_certificates  String?
+  user_id                    String
+  user                       User    @relation(fields: [user_id], references: [uniqueID])
+}
+
