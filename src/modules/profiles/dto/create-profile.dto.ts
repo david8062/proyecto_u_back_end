@@ -1,7 +1,6 @@
-import { IsString, IsOptional, IsNotEmpty } from 'class-validator';
+import { IsString, IsOptional, IsNotEmpty, IsBoolean } from 'class-validator';
 
 export class CreateProfileDto {
-
   @IsOptional()
   @IsString()
   description?: string;
@@ -30,9 +29,15 @@ export class CreateProfileDto {
   @IsString()
   professional_certificates?: string;
 
-@IsString()
-@IsNotEmpty()
-user_id!: string;
+  @IsOptional()
+  @IsBoolean()
+  is_verified?: boolean;
 
+  @IsOptional()
+  @IsBoolean()
+  is_active?: boolean;
 
+  @IsString()
+  @IsNotEmpty()
+  user_id!: string;
 }

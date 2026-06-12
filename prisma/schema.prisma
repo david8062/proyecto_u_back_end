@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-///////////////////Enum Definitions/////////////////////
+////////////////////// Enums //////////////////////
 
 enum level {
   BASIC
@@ -21,9 +15,33 @@ enum level {
   ADVANCED
 }
 
+enum ServiceType {
+  CLASE_PERSONALIZADA
+  REVISION_TAREA
+  REVISION_PARCIAL
+  TUTORIA_PROYECTO
+}
 
+enum DegreeLevel {
+  BACHILLERATO
+  PREGRADO
+  ESPECIALIZACION
+  MAESTRIA
+  DOCTORADO
+}
 
-///////////////////Model Definitions login/////////////////////
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+////////////////////// Auth & Users //////////////////////
+
 model User {
   uniqueID         String   @id @default(uuid())
   primer_nombre    String   @db.VarChar(70)
@@ -34,51 +52,30 @@ model User {
   email            String   @unique @db.VarChar(70)
   has_password     String   @db.VarChar(256)
 
-  faculty_uuid     String
-  rol_uuid         String   // <--- Relación directa al rol
+  faculty_uuid      String?
+  rol_uuid          String
   id_password_reset String?
 
-  // Relaciones
-  faculty       Faculty    @relation(fields: [faculty_uuid], references: [uniqueID])
-  role          Rol        @relation(fields: [rol_uuid], references: [uniqueID])
+  faculty       Faculty?      @relation(fields: [faculty_uuid], references: [uniqueID])
+  role          Rol           @relation(fields: [rol_uuid], references: [uniqueID])
   passwordReset PasswordReset?
   loginAttempts LoginAttemp[]
-
-  Review Review[]
-
-  ENROLLMENT ENROLLMENT[]
-
-  Course Course[]
-
-  profiles  Profile[] // relación inversa
+  profiles      Profile[]
 }
-
-model Faculty {
-  uniqueID     String   @id @default(uuid())
-  faculty_name String   @db.VarChar(30)
-
-  users        User[]
-  careers      UniversityCarrer[] // ← relación inversa
-  Categorys Category[] // ← relación inversa
-}
-
 
 model Rol {
-  uniqueID    String   @id @default(uuid())
-  name_rol    String   @db.VarChar(10)
-  users       User[]   // Relación inversa
+  uniqueID  String           @id @default(uuid())
+  name_rol  String           @db.VarChar(10)
+  users     User[]
   permissions RolePermission[]
 }
 
-
-
 model RolePermission {
-  uuid             String   @id @default(uuid())
-  view_permission  String   @db.VarChar(10)
-  action_permission String  @db.VarChar(10)
-
-  rol_id           String
-  rol              Rol     @relation(fields: [rol_id], references: [uniqueID])
+  uuid              String @id @default(uuid())
+  view_permission   String @db.VarChar(10)
+  action_permission String @db.VarChar(10)
+  rol_id            String
+  rol               Rol    @relation(fields: [rol_id], references: [uniqueID])
 }
 
 model PasswordReset {
@@ -88,123 +85,120 @@ model PasswordReset {
   new_password String
   ip           String
   user_id      String   @unique
-
   user         User     @relation(fields: [user_id], references: [uniqueID])
 }
 
 model VerifyToken {
-  uniqueID String  @id @default(uuid())
-  token    String  @db.VarChar(50)
-  otp      String  @db.VarChar(6)
-
+  uniqueID      String        @id @default(uuid())
+  token         String        @db.VarChar(50)
+  otp           String        @db.VarChar(6)
   loginAttempts LoginAttemp[]
 }
 
 model LoginAttemp {
-  unique_ID     String   @id @default(uuid())
-  ip            Int
-  quantity      Int
-  login_acces   DateTime
-  user_id       String
-  id_token      String
-
-  user          User       @relation(fields: [user_id], references: [uniqueID])
-  verifyToken   VerifyToken @relation(fields: [id_token], references: [uniqueID])
+  unique_ID   String      @id @default(uuid())
+  ip          Int
+  quantity    Int
+  login_acces DateTime
+  user_id     String
+  id_token    String
+  user        User        @relation(fields: [user_id], references: [uniqueID])
+  verifyToken VerifyToken @relation(fields: [id_token], references: [uniqueID])
 }
 
-//////////////////////Model Definitions Course/////////////////////
+////////////////////// Academic Structure //////////////////////
+
+model Faculty {
+  uniqueID     String             @id @default(uuid())
+  faculty_name String             @db.VarChar(30)
+  users        User[]
+  careers      UniversityCarrer[]
+  categories   Category[]
+}
+
 model UniversityCarrer {
-  uniqueID String @id @default(uuid())
-  name     String @db.VarChar(20)  
-
+  uniqueID   String     @id @default(uuid())
+  name       String     @db.VarChar(50)
   faculty_id String
-  faculty    Faculty @relation(fields: [faculty_id], references: [uniqueID])
-
-  categories Category[] // ← relación inversa
+  faculty    Faculty    @relation(fields: [faculty_id], references: [uniqueID])
+  categories Category[]
 }
 
 model Category {
-  uniqueID String @id @default(uuid())
-  name     String @db.VarChar(10)
-  description String @db.VarChar(255)
+  uniqueID           String           @id @default(uuid())
+  name               String           @db.VarChar(50)
+  description        String           @db.VarChar(255)
   universityCarrerID String
-  facultyID String
-
-  UniversityCarrer UniversityCarrer @relation(fields: [universityCarrerID], references: [uniqueID])
-  faculty Faculty @relation(fields: [facultyID], references: [uniqueID])
-
-
-  Course Course[]
+  facultyID          String
+  UniversityCarrer   UniversityCarrer @relation(fields: [universityCarrerID], references: [uniqueID])
+  faculty            Faculty          @relation(fields: [facultyID], references: [uniqueID])
+  subjects           TeacherSubject[]
 }
 
-
-model Tag {
-  uniqueID String   @id @default(uuid())
-  name     String   @db.VarChar(10)
-
-  courses  Course[] @relation("CourseTags")
-}
-
-model Course {
-  uniqueID     String   @id @default(uuid())
-  name         String   @db.VarChar(50)
-  description  String   @db.VarChar(255)
-  title        String   @db.VarChar(15)
-  level        level    @default(BASIC)  
-  url_image    String   @db.VarChar(255)
-  category_id  String
-  teachaer_user_id String
-  tags         Tag[]    @relation("CourseTags")
-
-  Classes Classes[]
-
-  ENROLLMENT ENROLLMENT[]
-  category     Category @relation(fields: [category_id], references: [uniqueID])
-  teacher      User     @relation(fields: [teachaer_user_id], references: [uniqueID])
-}
-
-model Review {
-  uniqueID String @id @default(uuid())
-  review   String @db.VarChar(255)
-  rating   Int
-
-  user_id  String
-  class_id String
-
-  user    User    @relation(fields: [user_id], references: [uniqueID])
-  class   Classes @relation(fields: [class_id], references: [uniqueID])
-}
-
-
- model Classes {
-  uniqueID String @id @default(uuid())
-  description String @db.VarChar(255)
-  title String @db.VarChar(25)
-  url_video String @db.VarChar(255)
-  course_id String
-  course Course @relation(fields: [course_id], references: [uniqueID])
-  Review Review[]
- }
-
- model ENROLLMENT {
-  uniqueID String @id @default(uuid())
-  user_id String
-  coursed_id String
-
-  user User @relation(fields: [user_id], references: [uniqueID])
-  course Course @relation(fields: [coursed_id], references: [uniqueID])
- }
+////////////////////// Teacher Module — Phase 1 //////////////////////
 
 model Profile {
-  UniqueID                   String  @id @default(uuid())
-  description                String?
-  experience                 String?
-  profile_img                String?
-  specialization             String?
-  web_site                   String?
-  social_networks            String?
-  professional_certificates  String?
-  user_id                    String
-  user                       User    @relation(fields: [user_id], references: [uniqueID])
+  UniqueID                  String   @id @default(uuid())
+  description               String?  @db.VarChar(500)
+  experience                String?  @db.VarChar(500)
+  profile_img               String?  @db.VarChar(255)
+  specialization            String?  @db.VarChar(255)
+  web_site                  String?  @db.VarChar(255)
+  social_networks           String?  @db.VarChar(255)
+  professional_certificates String?  @db.VarChar(255)
+  is_verified               Boolean  @default(false)
+  is_active                 Boolean  @default(true)
+  user_id                   String
+  user                      User     @relation(fields: [user_id], references: [uniqueID])
+
+  education    Education[]
+  subjects     TeacherSubject[]
+  pricingPlans PricingPlan[]
+  availability Availability[]
 }
 
+model Education {
+  uniqueID    String      @id @default(uuid())
+  degree      DegreeLevel
+  institution String      @db.VarChar(100)
+  field       String      @db.VarChar(100)
+  start_year  Int
+  end_year    Int?
+  is_current  Boolean     @default(false)
+  profile_id  String
+  profile     Profile     @relation(fields: [profile_id], references: [UniqueID])
+}
+
+model TeacherSubject {
+  uniqueID    String   @id @default(uuid())
+  level       level
+  description String?  @db.VarChar(255)
+  profile_id  String
+  category_id String
+  profile     Profile  @relation(fields: [profile_id], references: [UniqueID])
+  category    Category @relation(fields: [category_id], references: [uniqueID])
+}
+
+model PricingPlan {
+  uniqueID     String      @id @default(uuid())
+  service_type ServiceType
+  price        Decimal     @db.Decimal(10, 2)
+  description  String?     @db.VarChar(255)
+  is_active    Boolean     @default(true)
+  profile_id   String
+  profile      Profile     @relation(fields: [profile_id], references: [UniqueID])
+}
+
+// Cada registro define un bloque semanal recurrente.
+// slot_duration_minutes controla el tamaño de los turnos dentro del bloque,
+// evitando solapamiento al hacer booking (ej: 8:00-17:00 con 60 min → slots 8:00, 9:00 … 16:00).
+model Availability {
+  uniqueID              String    @id @default(uuid())
+  day_of_week           DayOfWeek
+  start_time            String    @db.VarChar(5)
+  end_time              String    @db.VarChar(5)
+  slot_duration_minutes Int
+  is_active             Boolean   @default(true)
+  profile_id            String
+  profile               Profile   @relation(fields: [profile_id], references: [UniqueID])
+}

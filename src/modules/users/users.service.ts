@@ -35,9 +35,9 @@ export class UsersService {
       cod_estudiante: dto.studentCode,
       email: dto.email,
       has_password: hashedPassword,
-      faculty: {
-        connect: { uniqueID: dto.facultyId },
-      },
+      faculty: dto.facultyId
+        ? { connect: { uniqueID: dto.facultyId } }
+        : undefined,
       role: {
         connect: { uniqueID: dto.roles },
       },

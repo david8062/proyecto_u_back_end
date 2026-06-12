@@ -25,8 +25,9 @@ export class CreateUserDto {
   @IsString()
   password!: string;
 
+  @IsOptional()
   @IsUUID()
-  facultyId!: string;
+  facultyId?: string;
 
   @IsOptional()
   @IsString()

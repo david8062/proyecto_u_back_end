@@ -1,0 +1,501 @@
+{
+  "info": {
+    "name": "StudyMatch API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "API completa de StudyMatch — plataforma de asesorías virtuales universitarias"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api/v1", "type": "string" },
+    { "key": "token",   "value": "", "type": "string" },
+    { "key": "profileId", "value": "", "type": "string" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "const res = pm.response.json();",
+                "const token = res?.data?.token ?? res?.token;",
+                "if (token) {",
+                "  pm.collectionVariables.set('token', token);",
+                "  console.log('✅ Token guardado');",
+                "}"
+              ]
+            }
+          }],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"profesor@test.com\",\n  \"password\": \"123456\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/auth/refresh", "host": ["{{baseUrl}}"], "path": ["auth", "refresh"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"<refresh_token>\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Me (perfil autenticado)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "👤 Usuarios",
+      "item": [
+        {
+          "name": "Registrar usuario",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Juan\",\n  \"middleName\": \"Carlos\",\n  \"lastName\": \"Pérez\",\n  \"secondLastName\": \"Gómez\",\n  \"email\": \"profesor@test.com\",\n  \"password\": \"123456\",\n  \"roles\": \"<rol_uuid>\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] }
+          }
+        },
+        {
+          "name": "Obtener usuario por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/users/:id", "host": ["{{baseUrl}}"], "path": ["users", ":id"],
+              "variable": [{ "key": "id", "value": "<user_uuid>" }] }
+          }
+        },
+        {
+          "name": "Actualizar usuario",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/users/:id", "host": ["{{baseUrl}}"], "path": ["users", ":id"],
+              "variable": [{ "key": "id", "value": "<user_uuid>" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Juan Actualizado\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar usuario",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/users/:id", "host": ["{{baseUrl}}"], "path": ["users", ":id"],
+              "variable": [{ "key": "id", "value": "<user_uuid>" }] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🎓 Roles",
+      "item": [
+        {
+          "name": "Listar roles",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/roles", "host": ["{{baseUrl}}"], "path": ["roles"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🏫 Facultades",
+      "item": [
+        {
+          "name": "Listar facultades",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/faculties", "host": ["{{baseUrl}}"], "path": ["faculties"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "📚 Categorías",
+      "item": [
+        {
+          "name": "Listar categorías",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] }
+          }
+        },
+        {
+          "name": "Obtener categoría por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/categories/:id", "host": ["{{baseUrl}}"], "path": ["categories", ":id"],
+              "variable": [{ "key": "id", "value": "<category_uuid>" }] }
+          }
+        },
+        {
+          "name": "Actualizar categoría",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/categories/:id", "host": ["{{baseUrl}}"], "path": ["categories", ":id"],
+              "variable": [{ "key": "id", "value": "<category_uuid>" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cálculo\",\n  \"description\": \"Cálculo diferencial e integral\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar categoría",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/categories/:id", "host": ["{{baseUrl}}"], "path": ["categories", ":id"],
+              "variable": [{ "key": "id", "value": "<category_uuid>" }] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🧑‍🏫 Perfil del Asesor",
+      "item": [
+        {
+          "name": "Crear perfil",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "const res = pm.response.json();",
+                "if (res?.data?.UniqueID) {",
+                "  pm.collectionVariables.set('profileId', res.data.UniqueID);",
+                "  console.log('✅ profileId guardado:', res.data.UniqueID);",
+                "}"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/profiles", "host": ["{{baseUrl}}"], "path": ["profiles"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Asesor especializado en matemáticas y física universitaria\",\n  \"experience\": \"5 años de experiencia como tutor universitario\",\n  \"specialization\": \"Cálculo, Álgebra Lineal, Física\",\n  \"web_site\": \"https://miportafolio.com\",\n  \"social_networks\": \"linkedin.com/in/miusuario\",\n  \"user_id\": \"<user_uuid>\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar perfiles",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/profiles", "host": ["{{baseUrl}}"], "path": ["profiles"] }
+          }
+        },
+        {
+          "name": "Obtener perfil por usuario",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "const res = pm.response.json();",
+                "if (res?.data?.UniqueID) {",
+                "  pm.collectionVariables.set('profileId', res.data.UniqueID);",
+                "}"
+              ]
+            }
+          }],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/profiles/user/:userId", "host": ["{{baseUrl}}"], "path": ["profiles", "user", ":userId"],
+              "variable": [{ "key": "userId", "value": "<user_uuid>" }] }
+          }
+        },
+        {
+          "name": "Obtener perfil por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/profiles/:id", "host": ["{{baseUrl}}"], "path": ["profiles", ":id"],
+              "variable": [{ "key": "id", "value": "{{profileId}}" }] }
+          }
+        },
+        {
+          "name": "Actualizar perfil",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/profiles/:id", "host": ["{{baseUrl}}"], "path": ["profiles", ":id"],
+              "variable": [{ "key": "id", "value": "{{profileId}}" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Descripción actualizada\",\n  \"specialization\": \"Cálculo y Álgebra\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar perfil",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/profiles/:id", "host": ["{{baseUrl}}"], "path": ["profiles", ":id"],
+              "variable": [{ "key": "id", "value": "{{profileId}}" }] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🎓 Formación Académica",
+      "item": [
+        {
+          "name": "Agregar título",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/education", "host": ["{{baseUrl}}"], "path": ["education"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"degree\": \"PREGRADO\",\n  \"institution\": \"Universidad Distrital\",\n  \"field\": \"Ingeniería de Sistemas\",\n  \"start_year\": 2015,\n  \"end_year\": 2020,\n  \"is_current\": false,\n  \"profile_id\": \"{{profileId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar títulos por perfil",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/education/profile/:profileId", "host": ["{{baseUrl}}"], "path": ["education", "profile", ":profileId"],
+              "variable": [{ "key": "profileId", "value": "{{profileId}}" }] }
+          }
+        },
+        {
+          "name": "Obtener título por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/education/:id", "host": ["{{baseUrl}}"], "path": ["education", ":id"],
+              "variable": [{ "key": "id", "value": "<education_uuid>" }] }
+          }
+        },
+        {
+          "name": "Actualizar título",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/education/:id", "host": ["{{baseUrl}}"], "path": ["education", ":id"],
+              "variable": [{ "key": "id", "value": "<education_uuid>" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"end_year\": 2021,\n  \"is_current\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar título",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/education/:id", "host": ["{{baseUrl}}"], "path": ["education", ":id"],
+              "variable": [{ "key": "id", "value": "<education_uuid>" }] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "📖 Materias que Enseña",
+      "item": [
+        {
+          "name": "Agregar materia",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/teacher-subjects", "host": ["{{baseUrl}}"], "path": ["teacher-subjects"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level\": \"INTERMEDIATE\",\n  \"description\": \"Cálculo diferencial e integral para ingeniería\",\n  \"profile_id\": \"{{profileId}}\",\n  \"category_id\": \"<category_uuid>\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar materias por perfil",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/teacher-subjects/profile/:profileId", "host": ["{{baseUrl}}"], "path": ["teacher-subjects", "profile", ":profileId"],
+              "variable": [{ "key": "profileId", "value": "{{profileId}}" }] }
+          }
+        },
+        {
+          "name": "Obtener materia por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/teacher-subjects/:id", "host": ["{{baseUrl}}"], "path": ["teacher-subjects", ":id"],
+              "variable": [{ "key": "id", "value": "<subject_uuid>" }] }
+          }
+        },
+        {
+          "name": "Actualizar materia",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/teacher-subjects/:id", "host": ["{{baseUrl}}"], "path": ["teacher-subjects", ":id"],
+              "variable": [{ "key": "id", "value": "<subject_uuid>" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level\": \"ADVANCED\",\n  \"description\": \"Descripción actualizada\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar materia",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/teacher-subjects/:id", "host": ["{{baseUrl}}"], "path": ["teacher-subjects", ":id"],
+              "variable": [{ "key": "id", "value": "<subject_uuid>" }] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "💰 Tarifas",
+      "item": [
+        {
+          "name": "Agregar tarifa",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/pricing-plans", "host": ["{{baseUrl}}"], "path": ["pricing-plans"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"service_type\": \"CLASE_PERSONALIZADA\",\n  \"price\": 50000,\n  \"description\": \"Clase de 1 hora con retroalimentación\",\n  \"is_active\": true,\n  \"profile_id\": \"{{profileId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar tarifas por perfil",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/pricing-plans/profile/:profileId", "host": ["{{baseUrl}}"], "path": ["pricing-plans", "profile", ":profileId"],
+              "variable": [{ "key": "profileId", "value": "{{profileId}}" }] }
+          }
+        },
+        {
+          "name": "Obtener tarifa por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/pricing-plans/:id", "host": ["{{baseUrl}}"], "path": ["pricing-plans", ":id"],
+              "variable": [{ "key": "id", "value": "<plan_uuid>" }] }
+          }
+        },
+        {
+          "name": "Actualizar tarifa",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/pricing-plans/:id", "host": ["{{baseUrl}}"], "path": ["pricing-plans", ":id"],
+              "variable": [{ "key": "id", "value": "<plan_uuid>" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 60000,\n  \"is_active\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar tarifa",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/pricing-plans/:id", "host": ["{{baseUrl}}"], "path": ["pricing-plans", ":id"],
+              "variable": [{ "key": "id", "value": "<plan_uuid>" }] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🗓️ Disponibilidad",
+      "item": [
+        {
+          "name": "Agregar bloque horario",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/availability", "host": ["{{baseUrl}}"], "path": ["availability"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"day_of_week\": \"MONDAY\",\n  \"start_time\": \"08:00\",\n  \"end_time\": \"17:00\",\n  \"slot_duration_minutes\": 60,\n  \"is_active\": true,\n  \"profile_id\": \"{{profileId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar disponibilidad por perfil",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/availability/profile/:profileId", "host": ["{{baseUrl}}"], "path": ["availability", "profile", ":profileId"],
+              "variable": [{ "key": "profileId", "value": "{{profileId}}" }] }
+          }
+        },
+        {
+          "name": "Obtener bloque por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/availability/:id", "host": ["{{baseUrl}}"], "path": ["availability", ":id"],
+              "variable": [{ "key": "id", "value": "<availability_uuid>" }] }
+          }
+        },
+        {
+          "name": "Actualizar bloque horario",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/availability/:id", "host": ["{{baseUrl}}"], "path": ["availability", ":id"],
+              "variable": [{ "key": "id", "value": "<availability_uuid>" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"end_time\": \"18:00\",\n  \"slot_duration_minutes\": 90\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar bloque horario",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/availability/:id", "host": ["{{baseUrl}}"], "path": ["availability", ":id"],
+              "variable": [{ "key": "id", "value": "<availability_uuid>" }] }
+          }
+        }
+      ]
+    }
+
+  ]
+}

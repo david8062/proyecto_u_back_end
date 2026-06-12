@@ -9,13 +9,18 @@ export class ProfilesController {
   constructor(private readonly profilesService: ProfilesService) {}
 
   @Post()
-  async create(@Body() createProfileDto: CreateProfileDto): Promise<Profile> {
-    return this.profilesService.create(createProfileDto);
+  async create(@Body() dto: CreateProfileDto): Promise<Profile> {
+    return this.profilesService.create(dto);
   }
 
   @Get()
   async findAll(): Promise<Profile[]> {
     return this.profilesService.getAll();
+  }
+
+  @Get('user/:userId')
+  async findByUser(@Param('userId') userId: string): Promise<Profile> {
+    return this.profilesService.getByUserId(userId);
   }
 
   @Get(':id')
@@ -24,16 +29,13 @@ export class ProfilesController {
   }
 
   @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateProfileDto: UpdateProfileDto,
-  ): Promise<Profile> {
-    return this.profilesService.update(id, updateProfileDto);
+  async update(@Param('id') id: string, @Body() dto: UpdateProfileDto): Promise<Profile> {
+    return this.profilesService.update(id, dto);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<{ message: string }> {
     await this.profilesService.delete(id);
-    return { message: `Profile with id ${id} deleted successfully` };
+    return { message: `Profile ${id} deleted` };
   }
 }
