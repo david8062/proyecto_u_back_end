@@ -6,18 +6,25 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { Profile } from '@prisma/client';
 
 const profileIncludes = {
+  user: { select: { primer_nombre: true, primer_apellido: true, email: true } },
   education: true,
   subjects: { include: { category: true } },
-  pricingPlans: true,
-  availability: true,
+  pricingPlans: { where: { is_active: true } },
+  availability: { where: { is_active: true } },
 };
 
 @Injectable()
 export class ProfilesService implements IBaseService<Profile> {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getAll(): Promise<Profile[]> {
-    return this.prisma.profile.findMany({ include: profileIncludes });
+  async getAll(categoryId?: string): Promise<Profile[]> {
+    const where: any = { is_active: true };
+
+    if (categoryId) {
+      where.subjects = { some: { category_id: categoryId } };
+    }
+
+    return this.prisma.profile.findMany({ where, include: profileIncludes });
   }
 
   async getById(id: string): Promise<Profile> {
@@ -47,7 +54,11 @@ export class ProfilesService implements IBaseService<Profile> {
   async update(id: string, data: UpdateProfileDto): Promise<Profile> {
     const existing = await this.prisma.profile.findUnique({ where: { UniqueID: id } });
     if (!existing) throw new NotFoundException(`Profile ${id} not found`);
-    return this.prisma.profile.update({ where: { UniqueID: id }, data });
+    return this.prisma.profile.update({
+      where: { UniqueID: id },
+      data,
+      include: profileIncludes,
+    });
   }
 
   async delete(id: string): Promise<void> {

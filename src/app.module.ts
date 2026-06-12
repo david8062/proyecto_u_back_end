@@ -12,6 +12,7 @@ import { TeacherSubjectsModule } from './modules/teacher-subjects/teacher-subjec
 import { PricingPlansModule } from './modules/pricing-plans/pricing-plans.module';
 import { AvailabilityModule } from './modules/availability/availability.module';
 import { RolesModule } from './modules/roles/roles.module';
+import { SessionsModule } from './modules/sessions/sessions.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { RolesModule } from './modules/roles/roles.module';
     PricingPlansModule,
     AvailabilityModule,
     RolesModule,
+    SessionsModule,
   ],
   providers: [MinioService],
 })

@@ -40,6 +40,13 @@ enum DayOfWeek {
   SUNDAY
 }
 
+enum SessionStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
 ////////////////////// Auth & Users //////////////////////
 
 model User {
@@ -56,17 +63,18 @@ model User {
   rol_uuid          String
   id_password_reset String?
 
-  faculty       Faculty?      @relation(fields: [faculty_uuid], references: [uniqueID])
-  role          Rol           @relation(fields: [rol_uuid], references: [uniqueID])
-  passwordReset PasswordReset?
-  loginAttempts LoginAttemp[]
-  profiles      Profile[]
+  faculty         Faculty?       @relation(fields: [faculty_uuid], references: [uniqueID])
+  role            Rol            @relation(fields: [rol_uuid], references: [uniqueID])
+  passwordReset   PasswordReset?
+  loginAttempts   LoginAttemp[]
+  profiles        Profile[]
+  studentSessions Session[]      @relation("StudentSessions")
 }
 
 model Rol {
-  uniqueID  String           @id @default(uuid())
-  name_rol  String           @db.VarChar(10)
-  users     User[]
+  uniqueID    String           @id @default(uuid())
+  name_rol    String           @db.VarChar(10)
+  users       User[]
   permissions RolePermission[]
 }
 
@@ -155,6 +163,7 @@ model Profile {
   subjects     TeacherSubject[]
   pricingPlans PricingPlan[]
   availability Availability[]
+  sessions     Session[]
 }
 
 model Education {
@@ -201,4 +210,25 @@ model Availability {
   is_active             Boolean   @default(true)
   profile_id            String
   profile               Profile   @relation(fields: [profile_id], references: [UniqueID])
+  sessions              Session[]
+}
+
+////////////////////// Student Module — Phase 2 //////////////////////
+
+model Session {
+  uniqueID        String        @id @default(uuid())
+  student_id      String
+  profile_id      String
+  availability_id String
+  service_type    ServiceType
+  scheduled_date  String        @db.VarChar(10)
+  start_time      String        @db.VarChar(5)
+  end_time        String        @db.VarChar(5)
+  status          SessionStatus @default(PENDING)
+  notes           String?       @db.VarChar(500)
+  created_at      DateTime      @default(now())
+
+  student      User         @relation("StudentSessions", fields: [student_id], references: [uniqueID])
+  profile      Profile      @relation(fields: [profile_id], references: [UniqueID])
+  availability Availability @relation(fields: [availability_id], references: [uniqueID])
 }

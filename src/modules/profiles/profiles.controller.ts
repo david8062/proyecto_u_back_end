@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ProfilesService } from './profiles.service';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -14,8 +14,8 @@ export class ProfilesController {
   }
 
   @Get()
-  async findAll(): Promise<Profile[]> {
-    return this.profilesService.getAll();
+  async findAll(@Query('category_id') categoryId?: string): Promise<Profile[]> {
+    return this.profilesService.getAll(categoryId);
   }
 
   @Get('user/:userId')
