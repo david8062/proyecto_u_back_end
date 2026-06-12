@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Availability } from '@prisma/client';
 import { CreateAvailabilityDto } from './dto/create-availability.dto';
@@ -9,17 +13,25 @@ export class AvailabilityService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getByProfile(profileId: string): Promise<Availability[]> {
-    return this.prisma.availability.findMany({ where: { profile_id: profileId } });
+    return this.prisma.availability.findMany({
+      where: { profile_id: profileId },
+    });
   }
 
   async getById(id: string): Promise<Availability> {
-    const item = await this.prisma.availability.findUnique({ where: { uniqueID: id } });
+    const item = await this.prisma.availability.findUnique({
+      where: { uniqueID: id },
+    });
     if (!item) throw new NotFoundException(`Availability ${id} not found`);
     return item;
   }
 
   async create(data: CreateAvailabilityDto): Promise<Availability> {
-    this.validateTimeRange(data.start_time, data.end_time, data.slot_duration_minutes);
+    this.validateTimeRange(
+      data.start_time,
+      data.end_time,
+      data.slot_duration_minutes,
+    );
     return this.prisma.availability.create({ data });
   }
 
@@ -27,7 +39,8 @@ export class AvailabilityService {
     const existing = await this.getById(id);
     const start = data.start_time ?? existing.start_time;
     const end = data.end_time ?? existing.end_time;
-    const duration = data.slot_duration_minutes ?? existing.slot_duration_minutes;
+    const duration =
+      data.slot_duration_minutes ?? existing.slot_duration_minutes;
     this.validateTimeRange(start, end, duration);
     return this.prisma.availability.update({ where: { uniqueID: id }, data });
   }
@@ -37,7 +50,11 @@ export class AvailabilityService {
     await this.prisma.availability.delete({ where: { uniqueID: id } });
   }
 
-  private validateTimeRange(start: string, end: string, slotMinutes: number): void {
+  private validateTimeRange(
+    start: string,
+    end: string,
+    slotMinutes: number,
+  ): void {
     const [sh, sm] = start.split(':').map(Number);
     const [eh, em] = end.split(':').map(Number);
     const startMins = sh * 60 + sm;

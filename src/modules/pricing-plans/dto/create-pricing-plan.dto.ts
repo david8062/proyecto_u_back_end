@@ -1,5 +1,13 @@
 import { ServiceType } from '@prisma/client';
-import { IsEnum, IsString, IsOptional, IsBoolean, IsNotEmpty, IsNumber, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsString,
+  IsOptional,
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  Min,
+} from 'class-validator';
 
 export class CreatePricingPlanDto {
   @IsEnum(ServiceType)

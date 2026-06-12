@@ -1,5 +1,14 @@
 import { DayOfWeek } from '@prisma/client';
-import { IsEnum, IsString, IsNotEmpty, IsInt, IsOptional, IsBoolean, Min, Matches } from 'class-validator';
+import {
+  IsEnum,
+  IsString,
+  IsNotEmpty,
+  IsInt,
+  IsOptional,
+  IsBoolean,
+  Min,
+  Matches,
+} from 'class-validator';
 
 export class CreateAvailabilityDto {
   @IsEnum(DayOfWeek)

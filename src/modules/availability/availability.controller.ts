@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { AvailabilityService } from './availability.service';
 import { CreateAvailabilityDto } from './dto/create-availability.dto';
 import { UpdateAvailabilityDto } from './dto/update-availability.dto';
@@ -14,7 +22,9 @@ export class AvailabilityController {
   }
 
   @Get('profile/:profileId')
-  async findByProfile(@Param('profileId') profileId: string): Promise<Availability[]> {
+  async findByProfile(
+    @Param('profileId') profileId: string,
+  ): Promise<Availability[]> {
     return this.availabilityService.getByProfile(profileId);
   }
 
@@ -24,7 +34,10 @@ export class AvailabilityController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() dto: UpdateAvailabilityDto): Promise<Availability> {
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateAvailabilityDto,
+  ): Promise<Availability> {
     return this.availabilityService.update(id, dto);
   }
 

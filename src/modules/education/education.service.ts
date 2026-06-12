@@ -13,7 +13,9 @@ export class EducationService {
   }
 
   async getById(id: string): Promise<Education> {
-    const item = await this.prisma.education.findUnique({ where: { uniqueID: id } });
+    const item = await this.prisma.education.findUnique({
+      where: { uniqueID: id },
+    });
     if (!item) throw new NotFoundException(`Education ${id} not found`);
     return item;
   }

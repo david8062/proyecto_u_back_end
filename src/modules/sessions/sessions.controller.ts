@@ -19,10 +19,7 @@ export class SessionsController {
 
   /** Turnos disponibles para un perfil en una fecha (público) */
   @Get('slots/:profileId')
-  getSlots(
-    @Param('profileId') profileId: string,
-    @Query('date') date: string,
-  ) {
+  getSlots(@Param('profileId') profileId: string, @Query('date') date: string) {
     return this.sessionsService.getSlots(profileId, date);
   }
 

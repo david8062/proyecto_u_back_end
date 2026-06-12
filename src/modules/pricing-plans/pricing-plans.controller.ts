@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { PricingPlansService } from './pricing-plans.service';
 import { CreatePricingPlanDto } from './dto/create-pricing-plan.dto';
 import { UpdatePricingPlanDto } from './dto/update-pricing-plan.dto';
@@ -14,7 +22,9 @@ export class PricingPlansController {
   }
 
   @Get('profile/:profileId')
-  async findByProfile(@Param('profileId') profileId: string): Promise<PricingPlan[]> {
+  async findByProfile(
+    @Param('profileId') profileId: string,
+  ): Promise<PricingPlan[]> {
     return this.pricingPlansService.getByProfile(profileId);
   }
 
@@ -24,7 +34,10 @@ export class PricingPlansController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() dto: UpdatePricingPlanDto): Promise<PricingPlan> {
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdatePricingPlanDto,
+  ): Promise<PricingPlan> {
     return this.pricingPlansService.update(id, dto);
   }
 

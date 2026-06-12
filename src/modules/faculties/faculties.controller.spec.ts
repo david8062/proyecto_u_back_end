@@ -5,10 +5,18 @@ import { FacultiesService } from './faculties.service';
 describe('FacultiesController', () => {
   let controller: FacultiesController;
 
+  const serviceMock = {
+    getAll: jest.fn(),
+    getById: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [FacultiesController],
-      providers: [FacultiesService],
+      providers: [{ provide: FacultiesService, useValue: serviceMock }],
     }).compile();
 
     controller = module.get<FacultiesController>(FacultiesController);

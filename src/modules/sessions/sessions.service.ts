@@ -75,7 +75,11 @@ export class SessionsService {
     for (let cur = startMins; cur + duration <= endMins; cur += duration) {
       const slotStart = this.minsToTime(cur);
       const slotEnd = this.minsToTime(cur + duration);
-      slots.push({ start_time: slotStart, end_time: slotEnd, available: !bookedSet.has(slotStart) });
+      slots.push({
+        start_time: slotStart,
+        end_time: slotEnd,
+        available: !bookedSet.has(slotStart),
+      });
     }
 
     return slots;
@@ -85,9 +89,12 @@ export class SessionsService {
     const availability = await this.prisma.availability.findUnique({
       where: { uniqueID: dto.availability_id },
     });
-    if (!availability) throw new NotFoundException('Bloque de disponibilidad no encontrado');
+    if (!availability)
+      throw new NotFoundException('Bloque de disponibilidad no encontrado');
     if (availability.profile_id !== dto.profile_id) {
-      throw new BadRequestException('El bloque no pertenece al perfil indicado');
+      throw new BadRequestException(
+        'El bloque no pertenece al perfil indicado',
+      );
     }
 
     const conflict = await this.prisma.session.findFirst({
@@ -99,7 +106,8 @@ export class SessionsService {
         status: { not: SessionStatus.CANCELLED },
       },
     });
-    if (conflict) throw new BadRequestException('El turno seleccionado ya está reservado');
+    if (conflict)
+      throw new BadRequestException('El turno seleccionado ya está reservado');
 
     const [sh, sm] = dto.start_time.split(':').map(Number);
     const endMins = sh * 60 + sm + availability.slot_duration_minutes;
@@ -163,8 +171,13 @@ export class SessionsService {
     });
   }
 
-  async updateStatus(sessionId: string, status: SessionStatus): Promise<Session> {
-    const session = await this.prisma.session.findUnique({ where: { uniqueID: sessionId } });
+  async updateStatus(
+    sessionId: string,
+    status: SessionStatus,
+  ): Promise<Session> {
+    const session = await this.prisma.session.findUnique({
+      where: { uniqueID: sessionId },
+    });
     if (!session) throw new NotFoundException('Sesión no encontrada');
     return this.prisma.session.update({
       where: { uniqueID: sessionId },
@@ -174,7 +187,9 @@ export class SessionsService {
   }
 
   private minsToTime(mins: number): string {
-    const h = Math.floor(mins / 60).toString().padStart(2, '0');
+    const h = Math.floor(mins / 60)
+      .toString()
+      .padStart(2, '0');
     const m = (mins % 60).toString().padStart(2, '0');
     return `${h}:${m}`;
   }

@@ -26,8 +26,11 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, unknown> {
           message =
             typeof response === 'string'
               ? response
-              : (response as any)?.message ?? message;
-          errorData = typeof response === 'object' ? (response as Record<string, unknown>) : null;
+              : ((response as any)?.message ?? message);
+          errorData =
+            typeof response === 'object'
+              ? (response as Record<string, unknown>)
+              : null;
         } else if (err instanceof Error) {
           message = err.message;
         }

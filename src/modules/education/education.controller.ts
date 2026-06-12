@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { EducationService } from './education.service';
 import { CreateEducationDto } from './dto/create-education.dto';
 import { UpdateEducationDto } from './dto/update-education.dto';
@@ -14,7 +22,9 @@ export class EducationController {
   }
 
   @Get('profile/:profileId')
-  async findByProfile(@Param('profileId') profileId: string): Promise<Education[]> {
+  async findByProfile(
+    @Param('profileId') profileId: string,
+  ): Promise<Education[]> {
     return this.educationService.getByProfile(profileId);
   }
 
@@ -24,7 +34,10 @@ export class EducationController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() dto: UpdateEducationDto): Promise<Education> {
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateEducationDto,
+  ): Promise<Education> {
     return this.educationService.update(id, dto);
   }
 

@@ -43,7 +43,8 @@ export class ProfilesService implements IBaseService<Profile> {
       include: profileIncludes,
     });
 
-    if (!profile) throw new NotFoundException(`Profile for user ${userId} not found`);
+    if (!profile)
+      throw new NotFoundException(`Profile for user ${userId} not found`);
     return profile;
   }
 
@@ -52,7 +53,9 @@ export class ProfilesService implements IBaseService<Profile> {
   }
 
   async update(id: string, data: UpdateProfileDto): Promise<Profile> {
-    const existing = await this.prisma.profile.findUnique({ where: { UniqueID: id } });
+    const existing = await this.prisma.profile.findUnique({
+      where: { UniqueID: id },
+    });
     if (!existing) throw new NotFoundException(`Profile ${id} not found`);
     return this.prisma.profile.update({
       where: { UniqueID: id },
@@ -62,7 +65,9 @@ export class ProfilesService implements IBaseService<Profile> {
   }
 
   async delete(id: string): Promise<void> {
-    const existing = await this.prisma.profile.findUnique({ where: { UniqueID: id } });
+    const existing = await this.prisma.profile.findUnique({
+      where: { UniqueID: id },
+    });
     if (!existing) throw new NotFoundException(`Profile ${id} not found`);
     await this.prisma.profile.delete({ where: { UniqueID: id } });
   }

@@ -1,5 +1,14 @@
 import { DegreeLevel } from '@prisma/client';
-import { IsEnum, IsString, IsInt, IsOptional, IsBoolean, IsNotEmpty, Min, Max } from 'class-validator';
+import {
+  IsEnum,
+  IsString,
+  IsInt,
+  IsOptional,
+  IsBoolean,
+  IsNotEmpty,
+  Min,
+  Max,
+} from 'class-validator';
 
 export class CreateEducationDto {
   @IsEnum(DegreeLevel)

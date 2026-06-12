@@ -31,7 +31,10 @@ export class TeacherSubjectsService {
     });
   }
 
-  async update(id: string, data: UpdateTeacherSubjectDto): Promise<TeacherSubject> {
+  async update(
+    id: string,
+    data: UpdateTeacherSubjectDto,
+  ): Promise<TeacherSubject> {
     await this.getById(id);
     return this.prisma.teacherSubject.update({
       where: { uniqueID: id },

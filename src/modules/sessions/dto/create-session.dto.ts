@@ -11,7 +11,9 @@ export class CreateSessionDto {
   @IsEnum(ServiceType)
   service_type!: ServiceType;
 
-  @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'scheduled_date debe ser YYYY-MM-DD' })
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
+    message: 'scheduled_date debe ser YYYY-MM-DD',
+  })
   scheduled_date!: string;
 
   @Matches(/^\d{2}:\d{2}$/, { message: 'start_time debe ser HH:MM' })
